@@ -6,8 +6,12 @@
 </head>
 <body>
 <h1>Hello World from Azure Static Web Apps!</h1>
+
+<p id="user-info">Not logged in</p>
+
 <a href="/.auth/login/aad">Login</a>
 <a href="/.auth/logout">Logout</a>
+
 <button onclick="loadTable()">Load My Workouts</button>
 <table id="workouts">
     <thead><tr><th>Date</th><th>Exercise</th><th>Sets</th><th>Reps</th><th>kg</th></tr></thead>
