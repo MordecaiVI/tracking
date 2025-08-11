@@ -44,6 +44,18 @@ async function loadTable() {
     if (el) el.value = `${yyyy}-${mm}-${dd}`;
 })();
 
+// Close the date picker when clicking the input while it's already open
+const dateInput = document.getElementById('date');
+if (dateInput) {
+    dateInput.addEventListener('mousedown', (e) => {
+        // If the input already has focus, prevent the default re-open and blur to close it
+        if (document.activeElement === dateInput) {
+            e.preventDefault();
+            dateInput.blur();
+        }
+    });
+}
+
 // handle submit
 const form = document.getElementById('add-form');
 if (form) {
@@ -80,9 +92,6 @@ if (form) {
             }
 
             msg.textContent = "Saved!";
-            // clear reps & kg for quick next entry
-            document.getElementById('reps').value = '';
-            document.getElementById('kg').value = '';
             // refresh table
             await loadTable();
             setTimeout(() => (msg.textContent = ''), 1200);
@@ -91,6 +100,28 @@ if (form) {
             console.error(err);
         }
     });
+}
+
+async function showUser() {
+    const res = await fetch('/.auth/me');
+    const info = document.getElementById('user-info');
+    const login = document.getElementById('loginBtn');
+    const logout = document.getElementById('logoutBtn');
+
+    if (!res.ok) {
+        info.textContent = 'Not logged in';
+        login.style.display = '';
+        logout.style.display = 'none';
+        return;
+    }
+
+    const data = await res.json();
+    const loggedIn = !!data.clientPrincipal;
+    info.textContent = loggedIn
+        ? `Logged in as: ${data.clientPrincipal.userDetails}`
+        : 'Not logged in';
+    login.style.display  = loggedIn ? 'none' : '';
+    logout.style.display = loggedIn ? '' : 'none';
 }
 
 // Run showUser() when the page loads
