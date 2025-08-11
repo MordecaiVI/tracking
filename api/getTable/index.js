@@ -1,12 +1,19 @@
+const { CosmosClient } = require("@azure/cosmos");
+
+const client = new CosmosClient(process.env.COSMOS_CONN_STRING);
+const database = client.database("workoutsdb");
+const container = database.container("workouts");
+
 module.exports = async function (context, req) {
-    // Optional: read logged-in user info
-    const principalHeader = req.headers['x-ms-client-principal'];
-    const user = principalHeader ? JSON.parse(Buffer.from(principalHeader, 'base64')) : null;
+    const p = req.headers["x-ms-client-principal"];
+    const user = p ? JSON.parse(Buffer.from(p, "base64")) : null;
+    if (!user) { context.res = { status: 401, body: "Not logged in" }; return; }
 
-    const rows = [
-        { date: "2025-08-11", exercise: "Squat", sets: 5, reps: 5, weight_kg: 80 },
-        { date: "2025-08-12", exercise: "Bench", sets: 5, reps: 5, weight_kg: 60 },
-    ];
+    const query = {
+        query: "SELECT c.id, c.date, c.exercise, c.sets, c.reps, c.weight_kg FROM c WHERE c.userId = @uid ORDER BY c.date DESC",
+        parameters: [{ name: "@uid", value: user.userId }]
+    };
 
-    context.res = { status: 200, body: rows };
+    const { resources } = await container.items.query(query).fetchAll();
+    context.res = { status: 200, headers: { "Content-Type": "application/json" }, body: resources };
 };
