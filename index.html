@@ -1,22 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Hello World</title>
+    <meta charset="UTF-8" />
+    <title>Workout Tracker</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<h1>Hello World from Azure Static Web Apps!</h1>
+<div class="container">
+    <h1>Workout Tracker</h1>
 
-<p id="user-info">Not logged in</p>
+    <p id="user-info" class="login-info">Not logged in</p>
 
-<a href="/.auth/login/aad">Login</a>
-<a href="/.auth/logout">Logout</a>
+    <div>
+        <a href="/.auth/login/aad">Login</a>
+        <a href="/.auth/logout">Logout</a>
+        <button onclick="loadTable()">Load My Workouts</button>
+    </div>
 
-<button onclick="loadTable()">Load My Workouts</button>
-<table id="workouts">
-    <thead><tr><th>Date</th><th>Exercise</th><th>Sets</th><th>Reps</th><th>kg</th></tr></thead>
-    <tbody></tbody>
-</table>
-</body>
+    <table id="workouts">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Exercise</th>
+            <th>Sets</th>
+            <th>Reps</th>
+            <th>kg</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
 <script src="script.js"></script>
+</body>
 </html>
