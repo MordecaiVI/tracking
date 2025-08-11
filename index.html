@@ -17,14 +17,53 @@
         <button onclick="loadTable()">Load My Workouts</button>
     </div>
 
+    <!-- Add-set form -->
+    <form id="add-form" class="form-row" style="margin-top:12px;">
+        <div class="field">
+            <label for="date">Date</label>
+            <input id="date" name="date" type="date" required />
+        </div>
+
+        <div class="field">
+            <label for="exercise">Exercise</label>
+            <input id="exercise" name="exercise" type="text" maxlength="60" placeholder="ex_name" required />
+        </div>
+
+        <div class="field">
+            <label for="target">Body part</label>
+            <select id="target" name="target">
+                <option>LR</option>
+                <option>L</option>
+                <option>R</option>
+                <option>Core</option>
+                <option>Back</option>
+                <option>Legs</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="reps">Reps</label>
+            <input id="reps" name="reps" type="number" min="1" step="1" required />
+        </div>
+
+        <div class="field">
+            <label for="kg">kg</label>
+            <input id="kg" name="kg" type="number" min="0" step="0.5" required />
+        </div>
+
+        <button type="submit">Add set</button>
+        <span id="form-msg" class="form-msg"></span>
+    </form>
+
+    <!-- Data table (no Sets column) -->
     <table id="workouts">
         <thead>
         <tr>
             <th>Date</th>
             <th>Exercise</th>
-            <th>Sets</th>
             <th>Reps</th>
             <th>kg</th>
+            <th>Body part</th>
         </tr>
         </thead>
         <tbody></tbody>
