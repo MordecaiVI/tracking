@@ -85,3 +85,26 @@ tr:hover {
     .form-row { grid-template-columns: 1fr 1fr; }
 }
 
+/* Loading state for the Load button */
+#loadBtn.loading {
+    position: relative;
+    opacity: 0.85;
+    pointer-events: none;         /* prevents double clicks */
+}
+
+#loadBtn.loading::after {
+    content: "";
+    position: absolute;
+    right: 10px;                  /* spinner position inside button */
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    animation: spin .8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+

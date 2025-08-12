@@ -1,38 +1,43 @@
-async function showUser() {
-    const res = await fetch('/.auth/me');
-    if (!res.ok) {
-        document.getElementById('user-info').textContent = 'Not logged in';
-        return;
-    }
-
-    const data = await res.json();
-    if (data.clientPrincipal) {
-        document.getElementById('user-info').textContent =
-            `Logged in as: ${data.clientPrincipal.userDetails}`;
-    } else {
-        document.getElementById('user-info').textContent = 'Not logged in';
-    }
-}
-
 async function loadTable() {
-    const res = await fetch('/api/getTable');
-    if (!res.ok) {
-        console.error('Not authorized or error');
-        return;
-    }
-    const rows = await res.json();
-    const tbody = document.querySelector('#workouts tbody');
-    tbody.innerHTML = rows.map(r =>
-        `<tr>
-            <td>${r.date}</td>
-            <td>${r.exercise}</td>
-            <td>${r.reps}</td>
-            <td>${r.weight_kg}</td>
-            <td>${r.target}</td>
-         </tr>`
-    ).join('');
-}
+    const btn = document.getElementById('loadBtn');
 
+    try {
+        // Start loading state
+        if (btn) {
+            btn.dataset.originalText = btn.textContent;
+            btn.textContent = 'Loading...';
+            btn.classList.add('loading');
+            btn.disabled = true;
+        }
+
+        const res = await fetch('/api/getTable', { credentials: 'include' });
+        if (!res.ok) {
+            console.error('Not authorized or error');
+            return;
+        }
+
+        const rows = await res.json();
+        const tbody = document.querySelector('#workouts tbody');
+        tbody.innerHTML = rows.map(r =>
+            `<tr>
+                <td>${r.date}</td>
+                <td>${r.exercise}</td>
+                <td>${r.reps}</td>
+                <td>${r.weight_kg}</td>
+                <td>${r.target}</td>
+             </tr>`
+        ).join('');
+    } catch (err) {
+        console.error('Error loading table:', err);
+    } finally {
+        // End loading state
+        if (btn) {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.textContent = btn.dataset.originalText || 'Load My Workouts';
+        }
+    }
+}
 
 // set default date to today
 (function setToday() {
