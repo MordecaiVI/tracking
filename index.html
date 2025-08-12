@@ -9,16 +9,18 @@
 <div class="container">
     <h1>Workout Tracker</h1>
 
-    <p id="user-info" class="login-info">Not logged in</p>
-
-    <div>
+    <div class="auth-cta">
         <a id="loginBtn" href="/.auth/login/aad">Login</a>
-        <a id="logoutBtn" href="/.auth/logout">Logout</a>
-        <button id="loadBtn" onclick="loadTable()">Load My Workouts</button>
+        <span id="user-info" class="login-info" aria-live="polite">login to start logging</span>
     </div>
 
+    <div class="top-actions">
+        <a id="logoutBtn" href="/.auth/logout" style="display:none;">Logout</a>
+    </div>
+
+
     <!-- Add-set form -->
-    <form id="add-form" class="form-row" style="margin-top:12px;">
+    <form id="add-form" class="form-row" style="margin-top:12px; display:none;">
         <div class="field">
             <label for="date">Date</label>
             <input id="date" name="date" type="date" required />
@@ -55,8 +57,8 @@
         <span id="form-msg" class="form-msg"></span>
     </form>
 
-    <!-- Data table (no Sets column) -->
-    <table id="workouts">
+    <!-- Data table -->
+    <table id="workouts" style="display:none;">
         <thead>
         <tr>
             <th>Date</th>

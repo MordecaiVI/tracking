@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const { CosmosClient } = require("@azure/cosmos"); // use v3.x in api/package.json
+const { CosmosClient } = require("@azure/cosmos");
 const client = new CosmosClient(process.env.COSMOS_CONN_STRING);
 const DB = "workoutsdb";
 const CT = "workouts";

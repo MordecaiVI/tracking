@@ -96,25 +96,35 @@ if (form) {
 }
 
 async function showUser() {
-    const res = await fetch('/.auth/me');
-    const info = document.getElementById('user-info');
-    const login = document.getElementById('loginBtn');
+    const info   = document.getElementById('user-info');
+    const login  = document.getElementById('loginBtn');
     const logout = document.getElementById('logoutBtn');
 
-    if (!res.ok) {
-        info.textContent = 'Not logged in';
-        login.style.display = '';
-        logout.style.display = 'none';
-        return;
-    }
+    // parts only visible when authenticated
+    const authedEls = [
+        document.getElementById('add-form'),
+        document.getElementById('workouts')
+    ];
 
-    const data = await res.json();
-    const loggedIn = !!data.clientPrincipal;
-    info.textContent = loggedIn
-        ? `Logged in as: ${data.clientPrincipal.userDetails}`
-        : 'Not logged in';
-    login.style.display  = loggedIn ? 'none' : '';
-    logout.style.display = loggedIn ? '' : 'none';
+    const setUI = (loggedIn, user='') => {
+        info.textContent = loggedIn ? `Logged in as: ${user}` : 'login to start logging';
+        if (login)  login.style.display  = loggedIn ? 'none' : '';
+        if (logout) logout.style.display = loggedIn ? '' : 'none';
+        authedEls.forEach(el => el && (el.style.display = loggedIn ? '' : 'none'));
+
+        if (loggedIn) loadTable();   // <-- auto-load sets when logged in
+    };
+
+    try {
+        const res = await fetch('/.auth/me', { credentials: 'include' });
+        if (!res.ok) return setUI(false);
+        const data = await res.json();
+        const cp = data?.clientPrincipal;
+        setUI(!!cp, cp?.userDetails || '');
+    } catch (e) {
+        console.error(e);
+        setUI(false);
+    }
 }
 
 // Run showUser() when the page loads
