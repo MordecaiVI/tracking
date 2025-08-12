@@ -190,7 +190,7 @@ async function showUser() {
     ];
 
     const setUI = (loggedIn, user = '') => {
-        info.textContent = loggedIn ? `Logged in as: ${maskEmail(user)}` : 'login to start logging';
+        info.textContent = loggedIn ? `Welcome back ${user}!` : 'Please login to start tracking';
         if (login) login.style.display = loggedIn ? 'none' : '';
         if (logout) logout.style.display = loggedIn ? '' : 'none';
         authedEls.forEach(el => el && (el.style.display = loggedIn ? '' : 'none'));
