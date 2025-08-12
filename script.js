@@ -44,32 +44,6 @@ async function loadTable() {
     if (el) el.value = `${yyyy}-${mm}-${dd}`;
 })();
 
-// Prevent date picker from closing and immediately reopening
-const dateInput = document.getElementById('date');
-if (dateInput) {
-    let suppressNextClick = false;
-
-    dateInput.addEventListener('pointerdown', (e) => {
-        // If it's already focused, the picker is open → close it and suppress the next click
-        if (document.activeElement === dateInput) {
-            suppressNextClick = true;
-            e.preventDefault();            // stop Chrome from starting a new open
-            dateInput.blur();              // closes the picker
-            dateInput.classList.add('no-pointer');
-            setTimeout(() => dateInput.classList.remove('no-pointer'), 200); // brief shield
-        }
-    });
-
-    dateInput.addEventListener('click', (e) => {
-        if (suppressNextClick) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            suppressNextClick = false;
-        }
-    });
-}
-
-
 // handle submit
 const form = document.getElementById('add-form');
 if (form) {
