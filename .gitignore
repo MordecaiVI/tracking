@@ -36,3 +36,8 @@ out
 # OS files
 .DS_Store
 Thumbs.db
+
+# Azure Functions local settings
+local.settings.json
+# Local SWA auth mock
+auth.json

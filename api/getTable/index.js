@@ -1,5 +1,4 @@
 const { CosmosClient } = require("@azure/cosmos");
-
 const client = new CosmosClient(process.env.COSMOS_CONN_STRING);
 const database = client.database("workoutsdb");
 const container = database.container("workouts");
