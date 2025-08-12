@@ -23,14 +23,15 @@ async function loadTable() {
     const rows = await res.json();
     const tbody = document.querySelector('#workouts tbody');
     tbody.innerHTML = rows.map(r =>
-        `<tr>
-            <td>${r.date}</td>
-            <td>${r.exercise}</td>
-            <td>${r.reps}</td>
-            <td>${r.weight_kg}</td>
-            <td>${r.target}</td>
-         </tr>`
+            `<tr>
+         <td>${r.date ?? ""}</td>
+         <td>${r.exercise ?? ""}</td>
+         <td>${r.reps ?? ""}</td>
+         <td>${r.weight_kg ?? ""}</td>
+         <td>${r.target ?? ""}</td>
+       </tr>`
     ).join('');
+
 }
 
 
@@ -44,17 +45,31 @@ async function loadTable() {
     if (el) el.value = `${yyyy}-${mm}-${dd}`;
 })();
 
-// Close the date picker when clicking the input while it's already open
+// Prevent date picker from closing and immediately reopening
 const dateInput = document.getElementById('date');
 if (dateInput) {
-    dateInput.addEventListener('mousedown', (e) => {
-        // If the input already has focus, prevent the default re-open and blur to close it
+    let suppressNextClick = false;
+
+    dateInput.addEventListener('pointerdown', (e) => {
+        // If it's already focused, the picker is open → close it and suppress the next click
         if (document.activeElement === dateInput) {
+            suppressNextClick = true;
+            e.preventDefault();            // stop Chrome from starting a new open
+            dateInput.blur();              // closes the picker
+            dateInput.classList.add('no-pointer');
+            setTimeout(() => dateInput.classList.remove('no-pointer'), 200); // brief shield
+        }
+    });
+
+    dateInput.addEventListener('click', (e) => {
+        if (suppressNextClick) {
             e.preventDefault();
-            dateInput.blur();
+            e.stopImmediatePropagation();
+            suppressNextClick = false;
         }
     });
 }
+
 
 // handle submit
 const form = document.getElementById('add-form');

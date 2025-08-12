@@ -85,3 +85,7 @@ tr:hover {
     .form-row { grid-template-columns: 1fr 1fr; }
 }
 
+/* Briefly disables clicks so the picker doesn't reopen instantly */
+.no-pointer { pointer-events: none; }
+
+
