@@ -14,7 +14,7 @@
     <div>
         <a id="loginBtn" href="/.auth/login/aad">Login</a>
         <a id="logoutBtn" href="/.auth/logout">Logout</a>
-        <button onclick="loadTable()">Load My Workouts</button>
+        <button id="loadBtn" onclick="loadTable()">Load My Workouts</button>
     </div>
 
     <!-- Add-set form -->
@@ -51,7 +51,7 @@
             <input id="kg" name="kg" type="number" min="0" step="0.5" required />
         </div>
 
-        <button type="submit">Add set</button>
+        <button type="submit">Submit set</button>
         <span id="form-msg" class="form-msg"></span>
     </form>
 
