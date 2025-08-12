@@ -17,7 +17,7 @@ module.exports = async function (context, req) {
                 body: JSON.stringify({ error: "Not logged in and no userId provided" }) });
         }
 
-        const { date, target, weight_kg, reps, exercise = "ex_name" } = req.body || {};
+        const { date, target, weight_kg, reps, exercise = "exercise" } = req.body || {};
         if (!date || !ALLOWED.has(target) || !Number.isFinite(weight_kg) || !Number.isInteger(reps)) {
             return (context.res = { status: 400, headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ error: "Invalid payload" }) });

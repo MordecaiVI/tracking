@@ -10,7 +10,7 @@ async function loadTable() {
             btn.disabled = true;
         }
 
-        const res = await fetch('/api/getTable', { credentials: 'include' });
+        const res = await fetch('/api/getTable', {credentials: 'include'});
         if (!res.ok) {
             console.error('Not authorized or error');
             return;
@@ -20,13 +20,25 @@ async function loadTable() {
         const tbody = document.querySelector('#workouts tbody');
         tbody.innerHTML = rows.map(r =>
             `<tr>
-                <td>${r.date}</td>
-                <td>${r.exercise}</td>
-                <td>${r.reps}</td>
-                <td>${r.weight_kg}</td>
-                <td>${r.target}</td>
-             </tr>`
+            <td>${r.date}</td>
+            <td>${r.exercise}</td>
+            <td>${r.target}</td>
+            <td>${r.weight_kg}</td>
+            <td>${r.reps}</td>
+            <td class="actions-cell">
+                <button class="icon-btn edit-btn" onclick="editSet('${r.id}')">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="icon-btn remove-btn" onclick="removeSet('${r.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+            </tr>`
         ).join('');
+
+
+
+
     } catch (err) {
         console.error('Error loading table:', err);
     } finally {
@@ -36,6 +48,52 @@ async function loadTable() {
             btn.classList.remove('loading');
             btn.textContent = btn.dataset.originalText || 'Load My Workouts';
         }
+    }
+}
+
+async function editSet(id) {
+    const newReps = prompt("Enter new reps:");
+    const newKg = prompt("Enter new weight (kg):");
+    if (!newReps || !newKg) return;
+
+    try {
+        const res = await fetch(`/api/updateWorkout?id=${encodeURIComponent(id)}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                reps: parseInt(newReps, 10),
+                weight_kg: parseFloat(newKg)
+            })
+        });
+
+        if (!res.ok) {
+            alert(`Error updating set: ${await res.text()}`);
+            return;
+        }
+        await loadTable(); // refresh table
+    } catch (err) {
+        console.error(err);
+        alert("Network error");
+    }
+}
+
+
+async function removeSet(id) {
+    if (!confirm("Are you sure you want to remove this set?")) return;
+    try {
+        const res = await fetch(`/api/deleteWorkout?id=${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        if (!res.ok) {
+            alert(`Error removing set: ${await res.text()}`);
+            return;
+        }
+        await loadTable(); // refresh
+    } catch (err) {
+        console.error(err);
+        alert("Network error");
     }
 }
 
@@ -58,7 +116,7 @@ if (form) {
 
         const payload = {
             date: document.getElementById('date').value,
-            exercise: document.getElementById('exercise').value.trim().slice(0, 60) || "ex_name",
+            exercise: document.getElementById('exercise').value.trim().slice(0, 60) || "exercise",
             target: document.getElementById('target').value,       // required by your API
             reps: parseInt(document.getElementById('reps').value, 10),
             weight_kg: parseFloat(document.getElementById('kg').value)
@@ -74,7 +132,7 @@ if (form) {
             const res = await fetch('/api/addWorkout', {
                 method: 'POST',
                 credentials: 'include', // send SWA auth cookie
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             });
 
@@ -96,8 +154,8 @@ if (form) {
 }
 
 async function showUser() {
-    const info   = document.getElementById('user-info');
-    const login  = document.getElementById('loginBtn');
+    const info = document.getElementById('user-info');
+    const login = document.getElementById('loginBtn');
     const logout = document.getElementById('logoutBtn');
 
     // parts only visible when authenticated
@@ -106,9 +164,9 @@ async function showUser() {
         document.getElementById('workouts')
     ];
 
-    const setUI = (loggedIn, user='') => {
+    const setUI = (loggedIn, user = '') => {
         info.textContent = loggedIn ? `Logged in as: ${user}` : 'login to start logging';
-        if (login)  login.style.display  = loggedIn ? 'none' : '';
+        if (login) login.style.display = loggedIn ? 'none' : '';
         if (logout) logout.style.display = loggedIn ? '' : 'none';
         authedEls.forEach(el => el && (el.style.display = loggedIn ? '' : 'none'));
 
@@ -116,7 +174,7 @@ async function showUser() {
     };
 
     try {
-        const res = await fetch('/.auth/me', { credentials: 'include' });
+        const res = await fetch('/.auth/me', {credentials: 'include'});
         if (!res.ok) return setUI(false);
         const data = await res.json();
         const cp = data?.clientPrincipal;
@@ -127,5 +185,9 @@ async function showUser() {
     }
 }
 
-// Run showUser() when the page loads
-showUser();
+document.addEventListener("DOMContentLoaded", function () {
+    flatpickr("#date", {
+        dateFormat: "Y-m-d" // forces YYYY-MM-DD
+    });
+    showUser();
+});
