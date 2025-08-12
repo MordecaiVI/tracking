@@ -178,10 +178,22 @@ if (form) {
     });
 }
 
-// ---------- auth / UI ----------
+// helper: prefer real name; fallback to userDetails; fallback to email prefix
+function pickDisplayName(cp) {
+    if (!cp) return '';
+    const fromClaim = Array.isArray(cp.claims)
+        ? cp.claims.find(c => c.typ === 'name' || c.type === 'name')?.val
+        : null;
+
+    const raw = fromClaim || cp.userDetails || '';
+    // if it's an email, show only the part before @
+    if (raw.includes('@')) return raw.split('@')[0];
+    return raw;
+}
+
 async function showUser() {
-    const info = document.getElementById('user-info');
-    const login = document.getElementById('loginBtn');
+    const info   = document.getElementById('user-info');
+    const login  = document.getElementById('loginBtn');
     const logout = document.getElementById('logoutBtn');
 
     const authedEls = [
@@ -189,9 +201,9 @@ async function showUser() {
         document.getElementById('workouts')
     ];
 
-    const setUI = (loggedIn, user = '') => {
-        info.textContent = loggedIn ? `Welcome back ${user}!` : 'Please login to start tracking';
-        if (login) login.style.display = loggedIn ? 'none' : '';
+    const setUI = (loggedIn, name = '') => {
+        info.textContent = loggedIn ? `Welcome back ${name}!` : 'Please login to start tracking';
+        if (login)  login.style.display  = loggedIn ? 'none' : '';
         if (logout) logout.style.display = loggedIn ? '' : 'none';
         authedEls.forEach(el => el && (el.style.display = loggedIn ? '' : 'none'));
         if (loggedIn) loadTable();
@@ -200,14 +212,18 @@ async function showUser() {
     try {
         const res = await fetch('/.auth/me', { credentials: 'include' });
         if (!res.ok) return setUI(false);
+
         const data = await res.json();
         const cp = data?.clientPrincipal;
-        setUI(!!cp, cp?.userDetails || '');
+        const displayName = pickDisplayName(cp);
+
+        setUI(!!cp, displayName);
     } catch (e) {
         console.error(e);
         setUI(false);
     }
 }
+
 
 // ---------- boot ----------
 document.addEventListener('DOMContentLoaded', function () {
