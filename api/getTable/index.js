@@ -1,32 +1,44 @@
 const { CosmosClient } = require("@azure/cosmos");
+
 const client = new CosmosClient(process.env.COSMOS_CONN_STRING);
-const DB = "workoutsdb";
-const CT = "workouts";
+const database = client.database("workoutsdb");
+const container = database.container("workouts");
 
 module.exports = async function (context, req) {
-    // require login
-    const p = req.headers["x-ms-client-principal"];
-    const claims = p ? JSON.parse(Buffer.from(p, "base64")) : null;
-    const userId = claims?.userId;
-    if (!userId) {
-        context.res = { status: 401, body: "Not logged in" };
-        return;
+    try {
+        // Require login (SWA passes user in this header)
+        const p = req.headers["x-ms-client-principal"];
+        const user = p ? JSON.parse(Buffer.from(p, "base64")) : null;
+        if (!user) {
+            context.res = { status: 401, body: "Not logged in" };
+            return;
+        }
+
+        // Return only the fields your UI expects (no 'sets', include 'target')
+        const query = {
+            query:
+                "SELECT c.id, c.date, c.exercise, c.reps, c.weight_kg, c.target " +
+                "FROM c WHERE c.userId = @uid " +
+                "ORDER BY c.date DESC, c.createdAt DESC",
+            parameters: [{ name: "@uid", value: user.userId }]
+        };
+
+        // Provide partitionKey for efficiency
+        const { resources } = await container.items
+            .query(query, { partitionKey: user.userId })
+            .fetchAll();
+
+        context.res = {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+            body: resources
+        };
+    } catch (err) {
+        // Helpful error body during debugging
+        context.res = {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ error: String(err.message || err) })
+        };
     }
-
-    const container = client.database(DB).container(CT);
-
-    // Return the fields your table expects, including `target`
-    const querySpec = {
-        query:
-            "SELECT c.date, c.exercise, c.reps, c.weight_kg, c.target " +
-            "FROM c WHERE c.userId = @userId " +
-            "ORDER BY c.date DESC, c.createdAt DESC",
-        parameters: [{ name: "@userId", value: userId }]
-    };
-
-    const { resources } = await container.items.query(querySpec, {
-        partitionKey: userId
-    }).fetchAll();
-
-    context.res = { status: 200, headers: { "Content-Type": "application/json" }, body: resources };
 };
