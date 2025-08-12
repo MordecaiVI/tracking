@@ -23,15 +23,14 @@ async function loadTable() {
     const rows = await res.json();
     const tbody = document.querySelector('#workouts tbody');
     tbody.innerHTML = rows.map(r =>
-            `<tr>
-         <td>${r.date ?? ""}</td>
-         <td>${r.exercise ?? ""}</td>
-         <td>${r.reps ?? ""}</td>
-         <td>${r.weight_kg ?? ""}</td>
-         <td>${r.target ?? ""}</td>
-       </tr>`
+        `<tr>
+            <td>${r.date}</td>
+            <td>${r.exercise}</td>
+            <td>${r.reps}</td>
+            <td>${r.weight_kg}</td>
+            <td>${r.target}</td>
+         </tr>`
     ).join('');
-
 }
 
 
