@@ -245,3 +245,36 @@ tr:hover {
     gap: 10px;
     margin-bottom: 8px;
 }
+
+/* Mobile-specific layout fixes */
+@media (max-width: 768px) {
+    /* Stack form fields vertically */
+    .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-row .field {
+        width: 100%;
+    }
+
+    /* Make table horizontally scrollable */
+    #workouts {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    #workouts th, #workouts td {
+        font-size: 14px;
+        padding: 6px;
+    }
+
+    /* Fix action buttons spacing */
+    #workouts td:last-child {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+    }
+}
