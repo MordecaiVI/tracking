@@ -139,7 +139,6 @@ const form = document.getElementById('add-form');
 if (form) {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const msg = document.getElementById('form-msg');
 
         const payload = {
             date: document.getElementById('date').value,
@@ -150,7 +149,7 @@ if (form) {
         };
 
         if (!payload.date || !Number.isInteger(payload.reps) || !Number.isFinite(payload.weight_kg)) {
-            msg.textContent = 'Please fill all fields correctly.';
+            console.warn('Form validation failed:', payload);
             return;
         }
 
@@ -164,19 +163,17 @@ if (form) {
 
             if (!res.ok) {
                 console.error('addWorkout failed:', res.status, await res.text());
-                msg.textContent = 'Could not save. Please try again.';
                 return;
             }
 
-            msg.textContent = 'Saved!';
             await loadTable();
-            setTimeout(() => (msg.textContent = ''), 1200);
+
         } catch (err) {
-            console.error(err);
-            msg.textContent = 'Network error';
+            console.error('Network error while saving workout:', err);
         }
     });
 }
+
 
 // helper: prefer real name; fallback to userDetails; fallback to email prefix
 function pickDisplayName(cp) {
